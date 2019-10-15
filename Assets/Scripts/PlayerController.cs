@@ -10,6 +10,9 @@ public class PlayerController : NetworkBehaviour
 
     public GameObject cuboPrefab;
 
+    private static int playerIdAvailable;
+    [SyncVar] private int playerId;
+
     private void Start()
     {
         //diferencia as cores
@@ -35,6 +38,16 @@ public class PlayerController : NetworkBehaviour
         var meshRenderer = GetComponent<MeshRenderer>();
 
         meshRenderer.material = material;
+
+        if (isServer)
+        {
+            if (isLocalPlayer)
+            {
+                playerIdAvailable = 0;
+            }
+            playerIdAvailable++;
+            playerId = playerIdAvailable;
+        }
     }
 
     private void Update()
@@ -62,7 +75,9 @@ public class PlayerController : NetworkBehaviour
         cubo.transform.position = transform.position + (transform.forward * 2);
         cubo.transform.rotation = transform.rotation;
 
-        cubo.GetComponent<MeshRenderer>().material = GetComponent<MeshRenderer>().material;
+        //cubo.GetComponent<MeshRenderer>().material = GetComponent<MeshRenderer>().material;
+
+        cubo.GetComponent<Cubo>().cuboId = playerId;
 
         NetworkServer.Spawn(cubo);
     }
